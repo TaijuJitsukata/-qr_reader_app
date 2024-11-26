@@ -1,0 +1,15 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+video, canvas {
+    width: 80%;
+    margin: 20px 0;
+    border: 1px solid #ccc;
+}
+
+#message {
+    font-size: 18px;
+    color: #333;
+}
