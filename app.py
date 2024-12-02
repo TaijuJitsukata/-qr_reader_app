@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, jsonify
 import requests
 import json
-import os  # 環境変数を取得するためのモジュールをインポート
+import os
 
-app = Flask(__name__, static_folder="static", template_folder="static")
+app = Flask(__name__, static_folder="static", template_folder="templates")  # template_folderを修正
 
 # Google Safe Browsing APIキー
 API_KEY = 'AIzaSyA4AFpKB4rW-ZSHfcrk3zgs4-Fgy4KTPPI'
@@ -34,7 +34,7 @@ def is_safe_url(url):
 # ホームページを提供
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html')  # 'index.html'をtemplatesフォルダから読み込む
 
 # QRコードの内容をチェックするAPI
 @app.route('/check_url', methods=['POST'])
@@ -46,6 +46,5 @@ def check_url():
 
 # アプリケーションのエントリポイント
 if __name__ == '__main__':
-    # Render環境では動的ポートを取得する必要がある
-    port = int(os.getenv("PORT", 5000))  # 環境変数PORTがない場合はデフォルトで5000を使用
+    port = int(os.getenv("PORT", 5000))  # Render環境では動的ポートを取得する必要がある
     app.run(host='0.0.0.0', port=port, debug=False)  # hostを0.0.0.0に設定
