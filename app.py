@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import requests
 import json
+import os  # 環境変数を取得するためのモジュールをインポート
 
 app = Flask(__name__, static_folder="static", template_folder="static")
 
@@ -43,5 +44,8 @@ def check_url():
     is_safe = is_safe_url(url)
     return jsonify({'is_safe': is_safe})
 
+# アプリケーションのエントリポイント
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Render環境では動的ポートを取得する必要がある
+    port = int(os.getenv("PORT", 5000))  # 環境変数PORTがない場合はデフォルトで5000を使用
+    app.run(host='0.0.0.0', port=port, debug=False)  # hostを0.0.0.0に設定
