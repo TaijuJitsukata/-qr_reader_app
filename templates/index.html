@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>セキュアQRコードリーダー</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="styles.css">
+    <!-- manifest.json のパス修正 -->
+    <link rel="manifest" href="/static/manifest.json">  
+    <!-- styles.css のパス修正 -->
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
     <h1>セキュアQRコードリーダー</h1>
@@ -13,6 +15,6 @@
     <canvas id="canvas"></canvas>
     <p id="message">QRコードをスキャンしてください。</p>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-    <script src="scripts.js"></script>
+    <script src="/static/scripts.js"></script>
 </body>
 </html>
