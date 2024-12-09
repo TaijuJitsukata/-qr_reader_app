@@ -3,27 +3,37 @@ const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 const message = document.getElementById('message');
 
+// カメラの起動を非同期関数で行う
 async function startCamera() {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        // ユーザーのカメラにアクセスをリクエスト
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment' }  // 背面カメラを指定
+        });
+        
+        // カメラのストリームをvideoタグに設定
         video.srcObject = stream;
         video.play();
 
-        // カメラ映像の高さと幅をcanvasに合わせる
+        // カメラのメタデータ（幅・高さ）を取得してcanvasのサイズを設定
         video.addEventListener('loadedmetadata', () => {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
         });
 
-        scanQRCode();  // QRコードスキャンを開始
+        // QRコードのスキャン開始
+        scanQRCode();
     } catch (err) {
+        // エラー発生時の処理
         message.textContent = "カメラへのアクセスが拒否されました。";
         message.style.color = "red";
         console.error("カメラへのアクセスエラー:", err);
     }
 }
 
+// QRコードスキャン処理
 function scanQRCode() {
+    // videoタグの映像をcanvasに描画
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
@@ -38,9 +48,11 @@ function scanQRCode() {
         message.textContent = "QRコードが検出されませんでした。";
     }
 
-    requestAnimationFrame(scanQRCode);  // 継続的にスキャンを行う
+    // 再帰的にQRコードスキャンを続ける
+    requestAnimationFrame(scanQRCode);
 }
 
+// URLの安全性をチェックするAPI
 async function checkURLSafety(url) {
     const response = await fetch('/check_url', {
         method: 'POST',
@@ -57,4 +69,5 @@ async function checkURLSafety(url) {
     }
 }
 
+// カメラ起動を開始
 startCamera();
