@@ -4,10 +4,23 @@ const context = canvas.getContext('2d');
 const message = document.getElementById('message');
 
 async function startCamera() {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-    video.srcObject = stream;
-    video.play();
-    scanQRCode();
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        video.srcObject = stream;
+        video.play();
+
+        // カメラ映像の高さと幅をcanvasに合わせる
+        video.addEventListener('loadedmetadata', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+        });
+
+        scanQRCode();  // QRコードスキャンを開始
+    } catch (err) {
+        message.textContent = "カメラへのアクセスが拒否されました。";
+        message.style.color = "red";
+        console.error("カメラへのアクセスエラー:", err);
+    }
 }
 
 function scanQRCode() {
@@ -25,7 +38,7 @@ function scanQRCode() {
         message.textContent = "QRコードが検出されませんでした。";
     }
 
-    requestAnimationFrame(scanQRCode);
+    requestAnimationFrame(scanQRCode);  // 継続的にスキャンを行う
 }
 
 async function checkURLSafety(url) {
