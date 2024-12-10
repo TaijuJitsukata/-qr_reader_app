@@ -10,7 +10,7 @@ async function startCamera() {
         const stream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: 'environment' }  // 背面カメラを指定
         });
-        
+
         // カメラのストリームをvideoタグに設定
         video.srcObject = stream;
         video.play();
