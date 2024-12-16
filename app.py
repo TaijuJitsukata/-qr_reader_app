@@ -37,12 +37,12 @@ def is_safe_url(url):
 
         # レスポンスのmatchesフィールドをチェック
         if 'matches' in result:
-            return False  # 危険なURL
-        return True  # 安全なURL
+            return {"is_safe": False, "message": "危険なURLです。"}
+        return {"is_safe": True, "message": "安全なURLです。"}
 
     except requests.exceptions.RequestException as e:
         print(f"APIリクエストエラー: {e}")
-        return None  # エラー時はNoneを返す
+        return {"is_safe": None, "message": "URLの安全性を確認できませんでした。"}
 
 # ホームページを提供
 @app.route('/')
@@ -54,12 +54,12 @@ def index():
 def check_url():
     data = request.json
     url = data.get('url', '')
-    is_safe = is_safe_url(url)
+    result = is_safe_url(url)
 
-    if is_safe is None:
-        return jsonify({'error': 'URLの安全性を確認できませんでした。'})
+    if result["is_safe"] is None:
+        return jsonify({'is_safe': None, 'message': result["message"]})
 
-    return jsonify({'is_safe': is_safe})
+    return jsonify({'is_safe': result["is_safe"], 'message': result["message"]})
 
 # アプリケーションのエントリポイント
 if __name__ == '__main__':
