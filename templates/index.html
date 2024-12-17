@@ -15,29 +15,30 @@
 
         h1 {
             color: #333;
-            margin-top: 20px;
+            margin: 20px 0;
         }
 
-        video, canvas {
+        video {
             width: 80%;
             max-width: 600px;
-            margin: 20px auto;
-            display: block;
-            border: 1px solid #ddd;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
         }
 
         #message {
             font-size: 18px;
             font-weight: bold;
-            margin: 10px 0;
+            margin: 20px;
+            color: #333;
         }
     </style>
 </head>
 <body>
     <h1>セキュアQRコードリーダー</h1>
+    <!-- カメラ映像 -->
     <video id="video" autoplay></video>
-    <canvas id="canvas"></canvas>
-    <p id="message">QRコードをスキャンしてください。</p>
+    <!-- メッセージ表示 -->
+    <p id="message">QRコードをスキャン中...</p>
 
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
     <script src="/static/scripts.js"></script>
