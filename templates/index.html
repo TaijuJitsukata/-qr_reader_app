@@ -4,16 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>セキュアQRコードリーダー</title>
-    <link rel="manifest" href="/static/manifest.json">
-    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 20px;
+        }
+
+        video, canvas {
+            width: 80%;
+            max-width: 600px;
+            margin: 20px auto;
+            display: block;
+            border: 1px solid #ddd;
+        }
+
+        #message {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
     <h1>セキュアQRコードリーダー</h1>
-    <!-- カメラ映像を表示するvideoタグ -->
     <video id="video" autoplay></video>
-    <!-- QRコード検出用のcanvas -->
     <canvas id="canvas"></canvas>
-
     <p id="message">QRコードをスキャンしてください。</p>
 
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
