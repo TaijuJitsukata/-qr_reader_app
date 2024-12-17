@@ -1,80 +1,67 @@
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const context = canvas.getContext('2d', { willReadFrequently: true }); // パフォーマンス向上
-const message = document.getElementById('message');
+from flask import Flask, render_template, request, jsonify
+import requests
+import json
+import os
 
-// カメラの起動
-async function startCamera() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'environment' }  // 背面カメラ
-        });
-        video.srcObject = stream;
-        video.play();
+app = Flask(__name__, static_folder="static", template_folder="templates")
 
-        video.addEventListener('loadedmetadata', () => {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            scanQRCode(); // QRコードスキャン開始
-        });
-    } catch (err) {
-        message.textContent = "カメラのアクセスが拒否されました。";
-        message.style.color = "red";
-        console.error("カメラエラー:", err);
-    }
-}
+# Google Safe Browsing APIキー
+API_KEY = 'AIzaSyA4AFpKB4rW-ZSHfcrk3zgs4-Fgy4KTPPI'
 
-// QRコードスキャン処理
-function scanQRCode() {
-    try {
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
-
-        if (qrCode) {
-            const qrText = qrCode.data;
-            message.textContent = `URLが検出されました: ${qrText}`;
-            message.style.color = "blue"; // 青色でURL表示
-            checkURLSafety(qrText);
-        } else {
-            message.textContent = "QRコードが検出されませんでした。";
-            message.style.color = "orange";
+# URLの安全性をチェックする関数
+def is_safe_url(url):
+    api_url = f'https://safebrowsing.googleapis.com/v4/threatMatches:find?key={API_KEY}'
+    payload = {
+        "client": {
+            "clientId": "qr_reader_app",
+            "clientVersion": "1.0"
+        },
+        "threatInfo": {
+            "threatTypes": [
+                "MALWARE",
+                "SOCIAL_ENGINEERING",
+                "UNWANTED_SOFTWARE",
+                "POTENTIALLY_HARMFUL_APPLICATION"
+            ],
+            "platformTypes": ["ANY_PLATFORM"],
+            "threatEntryTypes": ["URL"],
+            "threatEntries": [{"url": url}]
         }
-
-        requestAnimationFrame(scanQRCode); // スキャンを継続
-    } catch (err) {
-        console.error("スキャンエラー:", err);
-        message.textContent = "QRコードの読み取り中にエラーが発生しました。";
-        message.style.color = "red";
     }
-}
+    headers = {'Content-Type': 'application/json'}
 
-// URLの安全性を確認する
-async function checkURLSafety(url) {
-    try {
-        const response = await fetch('/check_url', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url })
-        });
-        const result = await response.json();
+    try:
+        response = requests.post(api_url, headers=headers, data=json.dumps(payload))
+        response.raise_for_status()  # HTTPステータスコードエラーをキャッチ
+        result = response.json()
 
-        if (result.is_safe === true) {
-            message.textContent = `安全なURLです: ${url}`;
-            message.style.color = "green";
-        } else if (result.is_safe === false) {
-            message.textContent = `危険なURLです: ${url}`;
-            message.style.color = "red";
-        } else {
-            message.textContent = "URLの安全性を確認できませんでした。";
-            message.style.color = "orange";
-        }
-    } catch (error) {
-        console.error("APIエラー:", error);
-        message.textContent = "URLの安全性確認中にエラーが発生しました。";
-        message.style.color = "red";
-    }
-}
+        # レスポンスのmatchesフィールドをチェック
+        if 'matches' in result:
+            return {"is_safe": False, "message": "危険なURLです。"}
+        return {"is_safe": True, "message": "安全なURLです。"}
 
-// カメラ起動を開始
-startCamera();
+    except requests.exceptions.RequestException as e:
+        print(f"APIリクエストエラー: {e}")
+        return {"is_safe": None, "message": "URLの安全性を確認できませんでした。"}
+
+# ホームページを提供
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+# QRコードの内容をチェックするAPI
+@app.route('/check_url', methods=['POST'])
+def check_url():
+    data = request.json
+    url = data.get('url', '')
+    result = is_safe_url(url)
+
+    if result["is_safe"] is None:
+        return jsonify({'is_safe': None, 'message': result["message"]})
+
+    return jsonify({'is_safe': result["is_safe"], 'message': result["message"]})
+
+# アプリケーションのエントリポイント
+if __name__ == '__main__':
+    port = int(os.getenv("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
