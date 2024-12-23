@@ -2,8 +2,10 @@ from flask import Flask, render_template, request, jsonify
 import requests
 import json
 import os
+from flask_cors import CORS  # CORSの設定用ライブラリ
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
+CORS(app, resources={r"/check_url": {"origins": "https://your-domain.com"}})  # 特定のオリジンを許可
 
 # Google Safe Browsing APIキー
 API_KEY = 'AIzaSyA4AFpKB4rW-ZSHfcrk3zgs4-Fgy4KTPPI'
@@ -32,10 +34,10 @@ def is_safe_url(url):
 
     try:
         response = requests.post(api_url, headers=headers, data=json.dumps(payload))
-        response.raise_for_status()  # HTTPステータスコードエラーをキャッチ
+        response.raise_for_status()  # HTTPエラーをキャッチ
         result = response.json()
 
-        # レスポンスのmatchesフィールドをチェック
+        # matchesがあれば危険なURLと判断
         if 'matches' in result:
             return {"is_safe": False, "message": "危険なURLです。"}
         return {"is_safe": True, "message": "安全なURLです。"}
@@ -60,6 +62,13 @@ def check_url():
         return jsonify({'is_safe': None, 'message': result["message"]})
 
     return jsonify({'is_safe': result["is_safe"], 'message': result["message"]})
+
+# HTTPS強制（Renderなど本番環境ではHTTPSがデフォルトになる）
+@app.before_request
+def enforce_https():
+    if not request.is_secure and not app.debug:
+        url = request.url.replace("http://", "https://", 1)
+        return redirect(url, code=301)
 
 # アプリケーションのエントリポイント
 if __name__ == '__main__':
