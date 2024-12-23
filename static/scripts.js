@@ -1,13 +1,13 @@
 const video = document.getElementById('video');
-const canvas = document.createElement('canvas'); // 非表示のcanvasを作成
-const context = canvas.getContext('2d', { willReadFrequently: true }); // パフォーマンス改善
+const canvas = document.createElement('canvas');
+const context = canvas.getContext('2d', { willReadFrequently: true });
 const message = document.getElementById('message');
 
 // カメラの起動
 async function startCamera() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'environment' }  // 背面カメラ
+            video: { facingMode: 'environment' }
         });
         video.srcObject = stream;
         video.play();
@@ -15,7 +15,7 @@ async function startCamera() {
         video.addEventListener('loadedmetadata', () => {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            scanQRCode(); // QRコードスキャン開始
+            scanQRCode();
         });
     } catch (err) {
         message.textContent = "カメラのアクセスが拒否されました。";
@@ -40,7 +40,7 @@ function scanQRCode() {
         message.style.color = "#333";
     }
 
-    requestAnimationFrame(scanQRCode); // スキャンを継続
+    requestAnimationFrame(scanQRCode);
 }
 
 // URLの安全性を確認する
@@ -60,7 +60,7 @@ async function checkURLSafety(url) {
             message.textContent = `危険なURLです: ${url}`;
             message.style.color = "red";
         } else {
-            message.textContent = "URLの安全性を確認できませんでした。";
+            message.textContent = result.message;
             message.style.color = "orange";
         }
     } catch (error) {
