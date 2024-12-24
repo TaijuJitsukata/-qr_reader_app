@@ -32,8 +32,8 @@ function scanQRCode() {
 
     if (qrCode) {
         const qrText = qrCode.data;
-        message.textContent = `QRコード検出: ${qrText}`;
-        message.style.color = "blue";
+        message.textContent = `URLが検出されました: ${qrText}`;
+        message.style.color = "blue"; // 青色でURL表示
         checkURLSafety(qrText);
     } else {
         message.textContent = "QRコードをスキャン中...";
@@ -55,13 +55,13 @@ async function checkURLSafety(url) {
 
         if (result.is_safe === true) {
             message.textContent = `安全なURLです: ${url}`;
-            message.style.color = "green";
+            message.style.color = "green"; // 安全なURLは緑色
         } else if (result.is_safe === false) {
             message.textContent = `危険なURLです: ${url}`;
-            message.style.color = "red";
+            message.style.color = "red"; // 危険なURLは赤色
         } else {
             message.textContent = result.message;
-            message.style.color = "orange";
+            message.style.color = "orange"; // エラー時はオレンジ色
         }
     } catch (error) {
         console.error("APIエラー:", error);
