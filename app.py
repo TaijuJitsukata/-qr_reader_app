@@ -2,13 +2,13 @@ from flask import Flask, render_template, request, jsonify
 import requests
 import json
 import os
-from flask_cors import CORS  # CORSの設定用ライブラリ
+from flask_cors import CORS
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
-CORS(app, resources={r"/check_url": {"origins": "https://your-domain.com"}})  # 特定のオリジンを許可
+CORS(app, resources={r"/check_url": {"origins": "*"}})  # 開発中は全オリジンを許可
 
 # Google Safe Browsing APIキー
-API_KEY = 'AIzaSyA4AFpKB4rW-ZSHfcrk3zgs4-Fgy4KTPPI'
+API_KEY = 'YOUR_GOOGLE_SAFE_BROWSING_API_KEY'
 
 # URLの安全性をチェックする関数
 def is_safe_url(url):
@@ -37,7 +37,7 @@ def is_safe_url(url):
         response.raise_for_status()  # HTTPエラーをキャッチ
         result = response.json()
 
-        # matchesがあれば危険なURLと判断
+        # matchesフィールドをチェックして危険か判定
         if 'matches' in result:
             return {"is_safe": False, "message": "危険なURLです。"}
         return {"is_safe": True, "message": "安全なURLです。"}
@@ -63,14 +63,6 @@ def check_url():
 
     return jsonify({'is_safe': result["is_safe"], 'message': result["message"]})
 
-# HTTPS強制（Renderなど本番環境ではHTTPSがデフォルトになる）
-@app.before_request
-def enforce_https():
-    if not request.is_secure and not app.debug:
-        url = request.url.replace("http://", "https://", 1)
-        return redirect(url, code=301)
-
-# アプリケーションのエントリポイント
 if __name__ == '__main__':
     port = int(os.getenv("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
