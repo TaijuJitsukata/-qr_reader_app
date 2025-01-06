@@ -32,15 +32,13 @@ function scanQRCode() {
 
     if (qrCode) {
         const qrText = qrCode.data;
-        message.textContent = `URLが検出されました: ${qrText}`;
-        message.style.color = "blue"; // 青色でURL表示
-        checkURLSafety(qrText);
+        checkURLSafety(qrText); // URLの安全性を確認
     } else {
         message.textContent = "QRコードをスキャン中...";
         message.style.color = "#333";
     }
 
-    requestAnimationFrame(scanQRCode);
+    requestAnimationFrame(scanQRCode); // スキャンを継続
 }
 
 // URLの安全性を確認する
