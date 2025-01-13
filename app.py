@@ -33,12 +33,11 @@ def is_safe_url(url):
     headers = {'Content-Type': 'application/json'}
 
     try:
-        # APIにリクエストを送信
         response = requests.post(api_url, headers=headers, data=json.dumps(payload))
         response.raise_for_status()  # HTTPエラーをキャッチ
         result = response.json()
 
-        # matchesがあれば危険なURLと判断
+        # matchesがあれば危険なURLと判断し、理由を返す
         if 'matches' in result:
             threats = []
             for match in result['matches']:
@@ -47,13 +46,9 @@ def is_safe_url(url):
         
         return {"is_safe": True, "message": "安全なURLです。", "reasons": []}
 
-    except requests.exceptions.HTTPError as e:
-        # HTTPエラーの詳細を理由として返す
-        return {"is_safe": None, "message": "Google Safe Browsing APIエラー", "reasons": [str(e)]}
-
     except requests.exceptions.RequestException as e:
-        # リクエスト失敗時のエラーメッセージを返す
-        return {"is_safe": None, "message": "ネットワークエラー", "reasons": [str(e)]}
+        # APIリクエスト失敗時の理由を返す
+        return {"is_safe": None, "message": "URLの安全性を確認できませんでした。", "reasons": [str(e)]}
 
     except Exception as e:
         # その他の例外処理
