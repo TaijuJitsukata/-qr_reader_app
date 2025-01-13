@@ -55,7 +55,9 @@ async function checkURLSafety(url) {
             message.textContent = `安全なURLです: ${url}`;
             message.style.color = "green"; // 安全なURLは緑色
         } else if (result.is_safe === false) {
-            message.textContent = `危険なURLです: ${url}`;
+            // 危険なURLの理由を表示
+            const reasons = result.reasons.join(', ');
+            message.innerHTML = `危険なURLです: ${url}<br>理由: ${reasons}`;
             message.style.color = "red"; // 危険なURLは赤色
         } else {
             message.textContent = result.message;
