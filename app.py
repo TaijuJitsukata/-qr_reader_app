@@ -5,7 +5,7 @@ import os
 from flask_cors import CORS
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
-CORS(app, resources={r"/check_url": {"origins": "*"}})  # 開発中は全オリジンを許可
+CORS(app, resources={r"/check_url": {"origins": "*"}})
 
 # Google Safe Browsing APIキー
 API_KEY = 'AIzaSyA4AFpKB4rW-ZSHfcrk3zgs4-Fgy4KTPPI'
@@ -37,14 +37,19 @@ def is_safe_url(url):
         response.raise_for_status()  # HTTPエラーをキャッチ
         result = response.json()
 
-        # matchesフィールドをチェックして危険か判定
+        # matchesがあれば危険なURLと判断し、理由を返す
         if 'matches' in result:
-            return {"is_safe": False, "message": "危険なURLです。"}
-        return {"is_safe": True, "message": "安全なURLです。"}
+            threats = []
+            for match in result['matches']:
+                threat_type = match['threatType']  # 危険の種類
+                threats.append(threat_type)
+            return {"is_safe": False, "message": "危険なURLです。", "reasons": threats}
+        
+        return {"is_safe": True, "message": "安全なURLです。", "reasons": []}
 
     except requests.exceptions.RequestException as e:
         print(f"APIリクエストエラー: {e}")
-        return {"is_safe": None, "message": "URLの安全性を確認できませんでした。"}
+        return {"is_safe": None, "message": "URLの安全性を確認できませんでした。", "reasons": []}
 
 # ホームページを提供
 @app.route('/')
@@ -59,9 +64,9 @@ def check_url():
     result = is_safe_url(url)
 
     if result["is_safe"] is None:
-        return jsonify({'is_safe': None, 'message': result["message"]})
+        return jsonify({'is_safe': None, 'message': result["message"], 'reasons': result["reasons"]})
 
-    return jsonify({'is_safe': result["is_safe"], 'message': result["message"]})
+    return jsonify({'is_safe': result["is_safe"], 'message': result["message"], 'reasons': result["reasons"]})
 
 if __name__ == '__main__':
     port = int(os.getenv("PORT", 5000))
