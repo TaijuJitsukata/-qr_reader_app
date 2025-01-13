@@ -55,13 +55,13 @@ async function checkURLSafety(url) {
             message.textContent = `安全なURLです: ${url}`;
             message.style.color = "green"; // 安全なURLは緑色
         } else if (result.is_safe === false) {
-            // 危険なURLの理由を表示
             const reasons = result.reasons.join(', ');
             message.innerHTML = `危険なURLです: ${url}<br>理由: ${reasons}`;
             message.style.color = "red"; // 危険なURLは赤色
         } else {
-            message.textContent = result.message;
-            message.style.color = "orange"; // エラー時はオレンジ色
+            const reasons = result.reasons.join(', ') || "理由が特定できません。";
+            message.innerHTML = `URLの安全性を確認できませんでした。<br>理由: ${reasons}`;
+            message.style.color = "orange"; // 判定不可はオレンジ色
         }
     } catch (error) {
         console.error("APIエラー:", error);
