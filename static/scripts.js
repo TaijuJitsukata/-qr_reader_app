@@ -42,7 +42,6 @@ function scanQRCode() {
 }
 
 // URLの安全性を確認する
-
 async function checkURLSafety(url) {
     try {
         const response = await fetch('/check_url', {
@@ -70,7 +69,6 @@ async function checkURLSafety(url) {
         message.style.color = "red";
     }
 }
-
 
 // カメラ起動を開始
 startCamera();
