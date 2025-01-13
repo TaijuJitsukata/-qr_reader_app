@@ -41,15 +41,18 @@ def is_safe_url(url):
         if 'matches' in result:
             threats = []
             for match in result['matches']:
-                threat_type = match['threatType']  # 危険の種類
-                threats.append(threat_type)
+                threats.append(match['threatType'])
             return {"is_safe": False, "message": "危険なURLです。", "reasons": threats}
         
         return {"is_safe": True, "message": "安全なURLです。", "reasons": []}
 
     except requests.exceptions.RequestException as e:
-        print(f"APIリクエストエラー: {e}")
-        return {"is_safe": None, "message": "URLの安全性を確認できませんでした。", "reasons": []}
+        # APIリクエスト失敗時の理由を返す
+        return {"is_safe": None, "message": "URLの安全性を確認できませんでした。", "reasons": [str(e)]}
+
+    except Exception as e:
+        # その他の例外処理
+        return {"is_safe": None, "message": "予期しないエラーが発生しました。", "reasons": [str(e)]}
 
 # ホームページを提供
 @app.route('/')
@@ -63,10 +66,11 @@ def check_url():
     url = data.get('url', '')
     result = is_safe_url(url)
 
-    if result["is_safe"] is None:
-        return jsonify({'is_safe': None, 'message': result["message"], 'reasons': result["reasons"]})
-
-    return jsonify({'is_safe': result["is_safe"], 'message': result["message"], 'reasons': result["reasons"]})
+    return jsonify({
+        'is_safe': result["is_safe"],
+        'message': result["message"],
+        'reasons': result["reasons"]
+    })
 
 if __name__ == '__main__':
     port = int(os.getenv("PORT", 5000))
