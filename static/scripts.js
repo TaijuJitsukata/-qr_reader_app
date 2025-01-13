@@ -39,6 +39,8 @@ function scanQRCode() {
 
         if (qrCode) {
             const qrText = qrCode.data;
+            message.textContent = `QRコード検出: ${qrText}`;
+            message.style.color = "blue";
             checkURLSafety(qrText); // URLの安全性を確認
         } else {
             message.textContent = "QRコードをスキャン中...";
@@ -48,7 +50,36 @@ function scanQRCode() {
         requestAnimationFrame(scanQRCode); // スキャンを継続
     } catch (err) {
         console.error("QRコードスキャンエラー:", err);
-        message.textContent = "QRコードのスキャン中にエラーが発生しました。";
+        message.textContent = `QRコードのスキャン中にエラーが発生しました: ${err.message}`;
+        message.style.color = "red";
+    }
+}
+
+// URLの安全性を確認する
+async function checkURLSafety(url) {
+    try {
+        const response = await fetch('/check_url', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url })
+        });
+        const result = await response.json();
+
+        if (result.is_safe === true) {
+            message.innerHTML = `安全なURLです: <a href="${url}" target="_blank">${url}</a>`;
+            message.style.color = "green";
+        } else if (result.is_safe === false) {
+            const reasons = result.reasons.join(', ');
+            message.innerHTML = `危険なURLです: ${url}<br>理由: ${reasons}`;
+            message.style.color = "red";
+        } else {
+            const reasons = result.reasons.join(', ') || "理由が特定できません。";
+            message.innerHTML = `URLの安全性を確認できませんでした。<br>理由: ${reasons}`;
+            message.style.color = "orange";
+        }
+    } catch (err) {
+        console.error("APIエラー:", err);
+        message.textContent = "URLの安全性確認中にエラーが発生しました。";
         message.style.color = "red";
     }
 }
