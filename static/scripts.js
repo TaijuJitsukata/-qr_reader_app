@@ -6,16 +6,10 @@ const message = document.getElementById('message');
 // カメラの起動
 async function startCamera() {
     try {
-        const constraints = {
-            video: {
-                facingMode: { ideal: 'environment' }, // 背面カメラを優先
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
-            }
-        };
-
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        video.srcObject = stream; // カメラストリームを設定
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment' }
+        });
+        video.srcObject = stream;
         video.play();
 
         video.addEventListener('loadedmetadata', () => {
@@ -28,13 +22,7 @@ async function startCamera() {
         message.style.color = "green";
     } catch (err) {
         console.error("カメラエラー:", err);
-        if (err.name === 'NotAllowedError') {
-            message.textContent = "カメラのアクセスが拒否されました。ブラウザの設定を確認してください。";
-        } else if (err.name === 'NotFoundError') {
-            message.textContent = "カメラが見つかりませんでした。デバイスにカメラが接続されているか確認してください。";
-        } else {
-            message.textContent = "カメラの起動中にエラーが発生しました。";
-        }
+        message.textContent = "カメラの起動中にエラーが発生しました。";
         message.style.color = "red";
     }
 }
@@ -48,9 +36,7 @@ function scanQRCode() {
 
         if (qrCode) {
             const qrText = qrCode.data;
-            message.textContent = `QRコード検出: ${qrText}`;
-            message.style.color = "blue";
-            checkURLSafety(qrText); // URLの安全性を確認
+            checkURLSafety(qrText);
         } else {
             message.textContent = "QRコードをスキャン中...";
             message.style.color = "#333";
