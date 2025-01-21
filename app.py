@@ -8,9 +8,8 @@ app = Flask(__name__, static_folder="static", template_folder="templates")
 CORS(app, resources={r"/check_url": {"origins": "*"}})
 
 # Google Safe Browsing APIキー
-API_KEY = 'AIzaSyA4AFpKB4rW-ZSHfcrk3zgs4-Fgy4KTPPI'
+API_KEY = 'YOUR_GOOGLE_SAFE_BROWSING_API_KEY'
 
-# URLの安全性をチェックする関数
 def is_safe_url(url):
     api_url = f'https://safebrowsing.googleapis.com/v4/threatMatches:find?key={API_KEY}'
     payload = {
@@ -49,12 +48,10 @@ def is_safe_url(url):
         # ネットワークエラーやAPIエラーの場合
         return {"is_safe": None, "message": "Google Safe Browsing APIエラー", "reasons": [str(e)]}
 
-# ホームページを提供
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# QRコードの内容をチェックするAPI
 @app.route('/check_url', methods=['POST'])
 def check_url():
     data = request.json
