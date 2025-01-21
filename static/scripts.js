@@ -9,13 +9,13 @@ async function startCamera() {
         const constraints = {
             video: {
                 facingMode: { ideal: 'environment' }, // 背面カメラを優先
-                width: { ideal: 1280 }, // 解像度を調整
+                width: { ideal: 1280 },
                 height: { ideal: 720 }
             }
         };
 
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        video.srcObject = stream;
+        video.srcObject = stream; // カメラストリームを設定
         video.play();
 
         video.addEventListener('loadedmetadata', () => {
@@ -26,7 +26,6 @@ async function startCamera() {
 
         message.textContent = "カメラが起動しました。QRコードを読み取ってください。";
         message.style.color = "green";
-
     } catch (err) {
         console.error("カメラエラー:", err);
         if (err.name === 'NotAllowedError') {
