@@ -10,16 +10,16 @@ app = Flask(__name__, static_folder="static", template_folder="templates")
 CORS(app, resources={r"/check_url": {"origins": "*"}})
 
 # Google Safe Browsing APIキー
-API_KEY = "AIzaSyA4AFpKB4rW-ZSHfcrk3zgs4-Fgy4KTPPI"
+API_KEY = "AIzaSyA4AFpKB4rW-ZSHfcrk3zgs4-Fgy4KTPPI"  # 必ず正しいキーを設定
 
 # ログ設定
-logging.basicConfig(level=logging.DEBUG)  # デバッグログを有効化
+logging.basicConfig(level=logging.DEBUG)  # デバッグ用
 
-# ルートページ（ホーム画面）
+# ルートページ
 @app.route("/")
 def index():
     logging.debug("🟢 ルートページにアクセスがありました")
-    return render_template("index.html")  # `templates/index.html` を返す
+    return render_template("index.html")
 
 # URLの安全性をチェックするエンドポイント
 @app.route("/check_url", methods=["POST"])
@@ -37,11 +37,7 @@ def check_url():
 
     logging.debug(f"🔍 URLのチェック結果: {result}")
 
-    return jsonify({
-        "is_safe": result["is_safe"],
-        "message": result["message"],
-        "reasons": result["reasons"]
-    })
+    return jsonify(result)
 
 # Google Safe Browsing API を使ってURLの安全性を確認
 def is_safe_url(url):
@@ -66,13 +62,13 @@ def is_safe_url(url):
     headers = {'Content-Type': 'application/json'}
 
     try:
-        logging.debug(f"🔍 APIリクエスト: {json.dumps(payload, indent=2)}")  # リクエスト内容をログに記録
+        logging.debug(f"🔍 APIリクエスト: {json.dumps(payload, indent=2)}")
 
         response = requests.post(api_url, headers=headers, json=payload)
-        response.raise_for_status()  # HTTPエラーが発生したら例外をスロー
+        response.raise_for_status()
         result = response.json()
 
-        logging.debug(f"🔍 APIレスポンス: {json.dumps(result, indent=2)}")  # APIのレスポンスを記録
+        logging.debug(f"🔍 APIレスポンス: {json.dumps(result, indent=2)}")
 
         if "matches" in result and result["matches"]:
             threats = [match["threatType"] for match in result["matches"]]
@@ -80,9 +76,13 @@ def is_safe_url(url):
 
         return {"is_safe": True, "message": "✅ 安全なURLです。", "reasons": []}
 
+    except requests.exceptions.HTTPError as http_err:
+        logging.error(f"🚨 HTTPエラー: {http_err}")
+        return {"is_safe": None, "message": "🚨 Google Safe Browsing APIエラー", "reasons": [str(http_err)]}
+
     except requests.exceptions.RequestException as e:
-        logging.error(f"🚨 APIエラー: {e}")
-        return {"is_safe": None, "message": "🚨 Google Safe Browsing APIエラー", "reasons": [str(e)]}
+        logging.error(f"🚨 APIリクエストエラー: {e}")
+        return {"is_safe": None, "message": "🚨 APIエラー", "reasons": [str(e)]}
 
 # アプリケーションのエントリポイント
 if __name__ == "__main__":
