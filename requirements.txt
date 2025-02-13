@@ -1,3 +1,7 @@
 Flask
 requests
 flask-cors
+gunicorn
+opencv-python
+pyzbar
+python-dotenv
