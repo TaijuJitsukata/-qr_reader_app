@@ -4,43 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>セキュアQRコードリーダー</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-        }
-
-        h1 {
-            color: #333;
-            margin: 20px 0;
-        }
-
-        video {
-            width: 80%;
-            max-width: 600px;
-            border: 2px solid #4CAF50;
-            border-radius: 10px;
-        }
-
-        #message {
-            font-size: 18px;
-            font-weight: bold;
-            margin: 20px;
-            color: #333;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>セキュアQRコードリーダー</h1>
-    <!-- カメラ映像 -->
     <video id="video" autoplay></video>
-    <!-- メッセージ表示 -->
-    <p id="message">QRコードをスキャン中...</p>
+    <p id="message">QRコードをスキャンしてください。</p>
 
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-    <script src="/static/scripts.js"></script>
+    <script src="scripts.js"></script>
 </body>
 </html>
