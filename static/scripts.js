@@ -3,7 +3,10 @@ const canvas = document.createElement('canvas');
 const context = canvas.getContext('2d', { willReadFrequently: true });
 const message = document.getElementById('message');
 
-// カメラの起動
+let lastScannedURLs = []; // 直近の読み取ったURLを記録
+const scanThreshold = 3; // 3回同じURLを検出したら確定
+
+// ✅ カメラの起動
 async function startCamera() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -27,7 +30,7 @@ async function startCamera() {
     }
 }
 
-// QRコードスキャン処理
+// ✅ QRコードスキャン処理
 function scanQRCode() {
     try {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -35,8 +38,21 @@ function scanQRCode() {
         const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
 
         if (qrCode) {
-            const qrText = qrCode.data;
-            checkURLSafety(qrText);
+            const qrText = qrCode.data.trim();
+
+            // 直近のスキャン履歴を更新
+            lastScannedURLs.push(qrText);
+            if (lastScannedURLs.length > scanThreshold) {
+                lastScannedURLs.shift(); // 古いデータを削除
+            }
+
+            // ✅ URLが一定回数一致した場合のみ確定
+            if (lastScannedURLs.filter(url => url === qrText).length === scanThreshold) {
+                message.textContent = `QRコード検出: ${qrText}`;
+                message.style.color = "blue";
+                checkURLSafety(qrText);
+                lastScannedURLs = []; // スキャン履歴をリセット
+            }
         } else {
             message.textContent = "QRコードをスキャン中...";
             message.style.color = "#333";
@@ -50,7 +66,7 @@ function scanQRCode() {
     }
 }
 
-// URLの安全性を確認する
+// ✅ URLの安全性を確認する
 async function checkURLSafety(url) {
     try {
         const response = await fetch('/check_url', {
@@ -60,24 +76,25 @@ async function checkURLSafety(url) {
         });
         const result = await response.json();
 
+        message.classList.remove("message-safe", "message-danger", "message-warning");
+
         if (result.is_safe === true) {
-            message.innerHTML = `安全なURLです: <a href="${url}" target="_blank">${url}</a>`;
-            message.style.color = "green";
+            message.innerHTML = `✅ 安全なURL: <a href="${url}" target="_blank">${url}</a>`;
+            message.classList.add("message-safe");
         } else if (result.is_safe === false) {
             const reasons = result.reasons.join(', ');
-            message.innerHTML = `危険なURLです: ${url}<br>理由: ${reasons}`;
-            message.style.color = "red";
+            message.innerHTML = `⚠️ 危険なURL: ${url}<br>🚨 理由: ${reasons}`;
+            message.classList.add("message-danger");
         } else {
-            const reasons = result.reasons.join(', ') || "理由が特定できません。";
-            message.innerHTML = `URLの安全性を確認できませんでした。<br>理由: ${reasons}`;
-            message.style.color = "orange";
+            message.innerHTML = `❓ URLの安全性を確認できませんでした。`;
+            message.classList.add("message-warning");
         }
     } catch (err) {
         console.error("APIエラー:", err);
         message.textContent = "URLの安全性確認中にエラーが発生しました。";
-        message.style.color = "red";
+        message.classList.add("message-danger");
     }
 }
 
-// カメラ起動を開始
+// ✅ カメラ起動を開始
 startCamera();
