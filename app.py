@@ -38,13 +38,15 @@ def is_safe_url(url):
     headers = {'Content-Type': 'application/json'}
 
     try:
-        response = requests.post(api_url, headers=headers, data=json.dumps(payload))
+        logging.debug(f"🔍 APIリクエスト: {json.dumps(payload, indent=2)}")  # リクエストをログに出力
+
+        response = requests.post(api_url, headers=headers, json=payload)  # `json=payload` に変更
         response.raise_for_status()  # HTTPエラーがあれば例外をスロー
         result = response.json()
 
-        logging.debug(f"🔍 APIレスポンス: {json.dumps(result, indent=2)}")  # デバッグログ
+        logging.debug(f"🔍 APIレスポンス: {json.dumps(result, indent=2)}")  # APIのレスポンスを確認
 
-        if "matches" in result:
+        if "matches" in result and result["matches"]:
             threats = [match["threatType"] for match in result["matches"]]
             return {"is_safe": False, "message": "⚠️ 危険なURLです！", "reasons": threats}
 
@@ -53,20 +55,6 @@ def is_safe_url(url):
     except requests.exceptions.RequestException as e:
         logging.error(f"🚨 APIエラー: {e}")
         return {"is_safe": None, "message": "🚨 Google Safe Browsing APIエラー", "reasons": [str(e)]}
-
-# 短縮URLを展開する関数（bit.ly など）
-def expand_url(url):
-    try:
-        response = requests.head(url, allow_redirects=True, timeout=5)
-        logging.debug(f"🔍 短縮URL展開: {url} → {response.url}")  # 展開結果をログに出力
-        return response.url  # 最終リダイレクトURLを取得
-    except requests.RequestException:
-        return url  # エラーの場合はそのまま返す
-
-# ホームページの表示
-@app.route("/")
-def index():
-    return render_template("index.html")
 
 # QRコードのURLをチェックするエンドポイント
 @app.route("/check_url", methods=["POST"])
@@ -77,8 +65,7 @@ def check_url():
     if not url:
         return jsonify({"is_safe": None, "message": "❌ URLが空です。", "reasons": ["入力されたURLがありません。"]})
 
-    expanded_url = expand_url(url)  # 短縮URLを展開
-    result = is_safe_url(expanded_url)  # 展開後のURLをチェック
+    result = is_safe_url(url)  # URLの安全性をチェック
 
     return jsonify({
         "is_safe": result["is_safe"],
