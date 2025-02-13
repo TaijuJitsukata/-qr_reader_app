@@ -34,40 +34,4 @@ function scanQRCode() {
                 checkURLSafety(qrText);
             }
         }
-        requestAnimationFrame(detectQRCode);
-    }
-
-    detectQRCode();
-}
-
-// URLの安全性をチェック
-async function checkURLSafety(url) {
-    try {
-        const response = await fetch('/check_url', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url })
-        });
-        const result = await response.json();
-
-        console.log("🔍 サーバーからのレスポンス:", result); // デバッグ用
-
-        // 結果に応じてUIを変更
-        if (result.is_safe === false) {
-            message.innerHTML = `⚠️ <span style="color: red;">危険なURLです！</span> <br> 理由: ${result.reasons.join(', ')}<br>
-                <a href="${url}" target="_blank">${url}</a>`;
-        } else if (result.is_safe === true) {
-            message.innerHTML = `✅ <span style="color: green;">安全なURLです。</span><br> 
-                <a href="${url}" target="_blank">${url}</a>`;
-        } else {
-            message.innerHTML = `❌ <span style="color: orange;">URLの安全性を確認できませんでした。</span> 理由: ${result.reasons.join(', ')}<br> 
-                <a href="${url}" target="_blank">${url}</a>`;
-        }
-    } catch (error) {
-        console.error("🚨 サーバーとの通信エラー:", error);
-        message.innerHTML = "❌ <span style='color: red;'>サーバーエラーが発生しました。</span>";
-    }
-}
-
-// カメラを起動
-startCamera();
+        requestAnimation
