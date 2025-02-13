@@ -8,7 +8,7 @@ app = Flask(__name__, static_folder="static", template_folder="templates")
 CORS(app, resources={r"/check_url": {"origins": "*"}})
 
 # Google Safe Browsing APIキー（必ず有効なものを使用）
-API_KEY = 'YOUR_GOOGLE_SAFE_BROWSING_API_KEY'
+API_KEY = 'AIzaSyA4AFpKB4rW-ZSHfcrk3zgs4-Fgy4KTPPI'
 
 # Google Safe Browsing API で URL の安全性をチェックする関数
 def is_safe_url(url):
