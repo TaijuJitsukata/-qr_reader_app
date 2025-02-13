@@ -62,14 +62,20 @@ async function checkURLSafety(url) {
         const result = await response.json();
         console.log("🔍 サーバーからのレスポンス:", result);  // デバッグ用
 
+        // UIに判別結果を反映
         if (result.is_safe === false) {
-            message.innerHTML = `⚠️ <span style="color: red;">危険なURLです！</span> <br> 理由: ${result.reasons.join(', ')}<br>
+            document.body.style.backgroundColor = "rgba(255, 0, 0, 0.2)"; // 背景を赤系に
+            message.innerHTML = `⚠️ <span style="color: red; font-size: 20px;">危険なURLです！</span> <br> 
+                <strong>理由:</strong> ${result.reasons.join(', ')}<br>
                 <a href="${url}" target="_blank">${url}</a>`;
         } else if (result.is_safe === true) {
-            message.innerHTML = `✅ <span style="color: green;">安全なURLです。</span><br> 
+            document.body.style.backgroundColor = "rgba(0, 255, 0, 0.2)"; // 背景を緑系に
+            message.innerHTML = `✅ <span style="color: green; font-size: 20px;">安全なURLです。</span><br> 
                 <a href="${url}" target="_blank">${url}</a>`;
         } else {
-            message.innerHTML = `❌ <span style="color: orange;">URLの安全性を確認できませんでした。</span> 理由: ${result.reasons.join(', ')}<br> 
+            document.body.style.backgroundColor = "rgba(255, 255, 0, 0.2)"; // 背景を黄色系に
+            message.innerHTML = `❌ <span style="color: orange;">URLの安全性を確認できませんでした。</span> <br> 
+                <strong>理由:</strong> ${result.reasons.join(', ')}<br> 
                 <a href="${url}" target="_blank">${url}</a>`;
         }
     } catch (error) {
