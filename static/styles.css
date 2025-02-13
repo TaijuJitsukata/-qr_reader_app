@@ -1,55 +1,78 @@
-/* ページ全体のスタイル */
+/* 全体のレイアウト設定 */
 body {
     font-family: Arial, sans-serif;
     text-align: center;
+    background-color: #f9f9f9;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
 }
 
-/* タイトルのデザイン */
+/* タイトルのスタイル */
 h1 {
-    color: #333;
-    font-size: 24px;
     margin: 20px 0;
+    color: #333;
 }
 
-/* カメラ映像の枠 */
+/* カメラ映像のコンテナ */
+.video-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+/* カメラ映像（QRコードスキャン） */
 video {
     width: 80%;
     max-width: 600px;
-    max-height: 60vh;
-    border: 3px solid #4CAF50; /* 緑色の枠 */
-    border-radius: 8px;
+    border: 4px solid #4CAF50;
+    border-radius: 10px;
     display: block;
     margin: 0 auto;
-    background-color: #000; /* カメラが映らない場合でも視覚的に表示 */
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); /* 影を追加して視認性向上 */
+    background-color: black; /* カメラが映らない場合でも視覚的に表示される */
 }
 
-/* メッセージのデザイン */
-p {
+/* スキャン結果のメッセージ */
+#message {
     margin-top: 20px;
     font-size: 18px;
     font-weight: bold;
     color: #333;
-    text-align: center;
 }
 
-/* URLの安全性表示（危険な場合） */
-.message-danger {
-    color: red;
+/* スキャン結果のURLリンク */
+#message a {
     font-weight: bold;
+    color: blue;
+    text-decoration: none;
 }
 
-/* URLの安全性表示（安全な場合） */
-.message-safe {
-    color: green;
-    font-weight: bold;
+#message a:hover {
+    text-decoration: underline;
 }
 
-/* URLの安全性が判定できない場合 */
-.message-warning {
-    color: orange;
-    font-weight: bold;
+/* 背景色の変化（JavaScript側で変更） */
+.safe-bg {
+    background-color: rgba(0, 255, 0, 0.2); /* 安全 */
+}
+
+.danger-bg {
+    background-color: rgba(255, 0, 0, 0.2); /* 危険 */
+}
+
+.unknown-bg {
+    background-color: rgba(255, 255, 0, 0.2); /* 判定不能 */
+}
+
+/* カメラ枠の色変更（JavaScript側で変更） */
+.safe-border {
+    border: 4px solid green !important;
+}
+
+.danger-border {
+    border: 4px solid red !important;
+}
+
+.unknown-border {
+    border: 4px solid yellow !important;
 }
