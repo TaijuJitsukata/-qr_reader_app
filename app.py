@@ -10,7 +10,7 @@ app = Flask(__name__, static_folder="static", template_folder="templates")
 CORS(app, resources={r"/check_url": {"origins": "*"}})
 
 # Google Safe Browsing APIキー
-API_KEY = "YOUR_GOOGLE_SAFE_BROWSING_API_KEY"
+API_KEY = "AIzaSyA4AFpKB4rW-ZSHfcrk3zgs4-Fgy4KTPPI"
 
 # ログ設定
 logging.basicConfig(level=logging.DEBUG)  # デバッグ用
