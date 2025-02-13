@@ -1,5 +1,6 @@
 const video = document.getElementById('video');
 const message = document.getElementById('message');
+const body = document.body;  // 背景色を変更するために body を取得
 
 // カメラの起動
 async function startCamera() {
@@ -62,18 +63,21 @@ async function checkURLSafety(url) {
         const result = await response.json();
         console.log("🔍 サーバーからのレスポンス:", result);  // デバッグ用
 
-        // UIに判別結果を反映
+        // 背景色を変更（カメラのUIには影響しないようにする）
         if (result.is_safe === false) {
-            document.body.style.backgroundColor = "rgba(255, 0, 0, 0.2)"; // 背景を赤系に
+            body.style.backgroundColor = "rgba(255, 0, 0, 0.2)"; // 赤色背景（危険）
+            video.style.border = "4px solid red"; // カメラ枠を赤に
             message.innerHTML = `⚠️ <span style="color: red; font-size: 20px;">危険なURLです！</span> <br> 
                 <strong>理由:</strong> ${result.reasons.join(', ')}<br>
                 <a href="${url}" target="_blank">${url}</a>`;
         } else if (result.is_safe === true) {
-            document.body.style.backgroundColor = "rgba(0, 255, 0, 0.2)"; // 背景を緑系に
+            body.style.backgroundColor = "rgba(0, 255, 0, 0.2)"; // 緑色背景（安全）
+            video.style.border = "4px solid green"; // カメラ枠を緑に
             message.innerHTML = `✅ <span style="color: green; font-size: 20px;">安全なURLです。</span><br> 
                 <a href="${url}" target="_blank">${url}</a>`;
         } else {
-            document.body.style.backgroundColor = "rgba(255, 255, 0, 0.2)"; // 背景を黄色系に
+            body.style.backgroundColor = "rgba(255, 255, 0, 0.2)"; // 黄色背景（判定不能）
+            video.style.border = "4px solid yellow"; // カメラ枠を黄色に
             message.innerHTML = `❌ <span style="color: orange;">URLの安全性を確認できませんでした。</span> <br> 
                 <strong>理由:</strong> ${result.reasons.join(', ')}<br> 
                 <a href="${url}" target="_blank">${url}</a>`;
